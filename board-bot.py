@@ -38,13 +38,19 @@ def post_image(path):
   print(response.text)
 
 print(f"Capturing {CANDIDATE_PATH}")
-subprocess.run(["rpicam-jpeg", "--nopreview", "--immediate", "--autofocus-on-capture", "--width", "1296", "--height", "972", "--output", CANDIDATE_PATH], check=True)
+subprocess.run(["rpicam-jpeg", "--nopreview", "--immediate", "--autofocus-on-capture", "--output", CANDIDATE_PATH],
+  check=True)
 
 current = cv2.imread(CURRENT_PATH)
 candidate = cv2.imread(CANDIDATE_PATH)
 
 current = cv2.cvtColor(current, cv2.COLOR_BGR2GRAY)
 candidate = cv2.cvtColor(candidate, cv2.COLOR_BGR2GRAY)
+
+size = (1296, 972)
+
+current = cv2.resize(current, size)
+candidate = cv2.resize(candidate, size)
 
 print("Calculating structural similarity")
 similarity = skimage.metrics.structural_similarity(current, candidate)
