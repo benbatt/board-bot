@@ -38,7 +38,7 @@ def post_image(path):
   print(response.text)
 
 print(f"Capturing {CANDIDATE_PATH}")
-subprocess.run(["rpicam-jpeg", "--immediate", "--autofocus-on-capture", "--width", "1296", "--height", "972", "--output", CANDIDATE_PATH], check=True)
+subprocess.run(["rpicam-jpeg", "--nopreview", "--immediate", "--autofocus-on-capture", "--width", "1296", "--height", "972", "--output", CANDIDATE_PATH], check=True)
 
 current = cv2.imread(CURRENT_PATH)
 candidate = cv2.imread(CANDIDATE_PATH)
