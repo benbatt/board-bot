@@ -5,6 +5,12 @@ import shutil
 import skimage.metrics
 import subprocess
 
+TOKEN_NAME = "BOARD_BOT_TOKEN"
+
+if TOKEN_NAME not in os.environ:
+    print(f"Error: {TOKEN_NAME} is not set")
+    exit(1)
+
 CURRENT_PATH = "current.jpeg"
 CANDIDATE_PATH = "candidate.jpeg"
 
@@ -12,7 +18,7 @@ SIMILARITY_THRESHOLD = 0.9
 
 def post_image(path):
   url = "https://gate.whapi.cloud/messages/image"
-  token = os.environ["BOARD_BOT_TOKEN"]
+  token = os.environ[TOKEN_NAME]
 
   data = {
     "to": "120363422200045729@g.us", # Board-bot-test group
