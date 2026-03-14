@@ -1,4 +1,5 @@
 import cv2
+import os
 import requests
 import shutil
 import skimage.metrics
@@ -11,7 +12,7 @@ SIMILARITY_THRESHOLD = 0.9
 
 def post_image(path):
   url = "https://gate.whapi.cloud/messages/image"
-  token = "TJxWS1xNvd7o30glG6k1fSzXsqgRPOhQ"
+  token = os.environ["BOARD_BOT_TOKEN"]
 
   data = {
     "to": "120363422200045729@g.us", # Board-bot-test group
