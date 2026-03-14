@@ -1,0 +1,15 @@
+[Unit]
+Description=Physical Noticeboard Replicator
+Documentation=man:systemd.service(5)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/ben/board-bot
+# Use the venv python interpreter
+ExecStart=/home/ben/board-bot/venv/bin/python /home/ben/board-bot/board-bot.py
+TimeoutStartSec=600
+PrivateTmp=yes
+ProtectSystem=full
+NoNewPrivileges=yes

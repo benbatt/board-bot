@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Board-bot update once a minute
+
+[Timer]
+# Run once a minute
+OnBootSec=0
+OnUnitActiveSec=1m
+
+[Install]
+WantedBy=timers.target
