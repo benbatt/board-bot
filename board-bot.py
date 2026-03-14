@@ -37,7 +37,9 @@ def post_image(path):
 
   print(response.text)
 
-print(f"Capturing {CANDIDATE_PATH}")
+# Using flush here so rpicam-jpeg output doesn't jump in first
+print(f"Capturing {CANDIDATE_PATH}", flush=True)
+
 subprocess.run(["rpicam-jpeg", "--nopreview", "--immediate", "--autofocus-on-capture", "--output", CANDIDATE_PATH],
   check=True)
 
