@@ -11,8 +11,8 @@ if TOKEN_NAME not in os.environ:
     print(f"Error: {TOKEN_NAME} is not set")
     exit(1)
 
-CURRENT_PATH = "current.jpeg"
-CANDIDATE_PATH = "candidate.jpeg"
+CURRENT_PATH = "server/static/current.jpeg"
+CANDIDATE_PATH = "server/static/candidate.jpeg"
 
 SIMILARITY_THRESHOLD = 0.9
 
