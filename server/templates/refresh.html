@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <title>Board-bot Refresh</title>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <h1>Board-bot Refresh</h1>
+  <pre class="log" id="output"></pre>
+  <script>
+    async function execute()
+    {
+      const decoder = new TextDecoder();
+      const output = document.getElementById("output");
+      const response = await fetch("/refresh/execute");
+
+      for await (const chunk of response.body) {
+        output.textContent += decoder.decode(chunk);
+      }
+    }
+
+    execute();
+  </script>
+</body>
+</html>

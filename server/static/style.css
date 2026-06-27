@@ -13,3 +13,19 @@ h1, h2 {
 
 .item {
 }
+
+.item h2 {
+  display: inline;
+}
+
+.log {
+  width: 80%;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: auto;
+  background-color: whitesmoke;
+}
+
+.hidden {
+  display: none;
+}

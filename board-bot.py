@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import os
 import requests
@@ -7,12 +8,11 @@ import subprocess
 
 TOKEN_NAME = "BOARD_BOT_TOKEN"
 
-if TOKEN_NAME not in os.environ:
-    print(f"Error: {TOKEN_NAME} is not set")
-    exit(1)
-
 CURRENT_PATH = "server/static/current.jpeg"
 CANDIDATE_PATH = "server/static/candidate.jpeg"
+
+CURRENT_SMALL_PATH = "server/static/current-small.jpeg"
+CANDIDATE_SMALL_PATH = "server/static/candidate-small.jpeg"
 
 SIMILARITY_THRESHOLD = 0.9
 
@@ -37,31 +37,59 @@ def post_image(path):
 
   print(response.text)
 
-# Using flush here so rpicam-jpeg output doesn't jump in first
-print(f"Capturing {CANDIDATE_PATH}", flush=True)
 
-subprocess.run(["rpicam-jpeg", "--nopreview", "--immediate", "--autofocus-on-capture", "--output", CANDIDATE_PATH],
-  check=True)
+def capture_candidate():
+  # Using flush here so rpicam-jpeg output doesn't jump in first
+  print(f"Capturing {CANDIDATE_PATH}...", flush=True)
 
-current = cv2.imread(CURRENT_PATH)
-candidate = cv2.imread(CANDIDATE_PATH)
+  subprocess.run(["rpicam-jpeg", "--nopreview", "--immediate", "--autofocus-on-capture", "--output", CANDIDATE_PATH],
+    check=True)
 
-current = cv2.cvtColor(current, cv2.COLOR_BGR2GRAY)
-candidate = cv2.cvtColor(candidate, cv2.COLOR_BGR2GRAY)
+  image = cv2.imread(CANDIDATE_PATH)
+  image = cv2.resize(image, (648, 486))
+  cv2.imwrite(CANDIDATE_SMALL_PATH, image)
 
-size = (1296, 972)
 
-current = cv2.resize(current, size)
-candidate = cv2.resize(candidate, size)
+def capture_and_update():
+  if TOKEN_NAME not in os.environ:
+      print(f"Error: {TOKEN_NAME} is not set")
+      exit(1)
 
-print("Calculating structural similarity")
-similarity = skimage.metrics.structural_similarity(current, candidate)
+  capture_candidate()
 
-print(f"Structural similarity = {similarity}")
+  current = cv2.imread(CURRENT_PATH)
+  candidate = cv2.imread(CANDIDATE_PATH)
 
-if similarity < SIMILARITY_THRESHOLD:
-  print("Updating current image")
-  shutil.copyfile(CANDIDATE_PATH, CURRENT_PATH)
-  post_image(CURRENT_PATH)
+  current = cv2.cvtColor(current, cv2.COLOR_BGR2GRAY)
+  candidate = cv2.cvtColor(candidate, cv2.COLOR_BGR2GRAY)
+
+  size = (1296, 972)
+
+  current = cv2.resize(current, size)
+  candidate = cv2.resize(candidate, size)
+
+  print("Calculating structural similarity...")
+  similarity = skimage.metrics.structural_similarity(current, candidate)
+
+  print(f"Structural similarity = {similarity}")
+
+  if similarity < SIMILARITY_THRESHOLD:
+    print("Updating current image...")
+    shutil.copyfile(CANDIDATE_PATH, CURRENT_PATH)
+    shutil.copyfile(CANDIDATE_SMALL_PATH, CURRENT_SMALL_PATH)
+    post_image(CURRENT_PATH)
+    print("Done")
+  else:
+    print("No change")
+
+
+parser = argparse.ArgumentParser(prog="board-bot", description="Physical noticeboard replicator")
+
+parser.add_argument("--capture-candidate", action="store_true")
+
+args = parser.parse_args()
+
+if args.capture_candidate:
+  capture_candidate()
 else:
-  print("No change")
+  capture_and_update()

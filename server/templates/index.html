@@ -6,15 +6,55 @@
 </head>
 <body>
   <h1>Board-bot Status</h1>
+  <form action="/refresh" method="post">
+    <input type="submit" value="Refresh">
+  </form>
   <div class="container">
     <div class="item">
       <h2>Current View</h2>
-      <a href="static/current.jpeg"><img src="static/current.jpeg"/></a>
+      <a href="static/current.jpeg"><img src="static/current-small.jpeg"/></a>
     </div>
     <div class="item">
       <h2>Candidate</h2>
-      <a href="static/candidate.jpeg"><img src="static/candidate.jpeg"/></a>
+      <input type="button" value="Refresh" id="candidate-refresh">
+      <a href="static/candidate.jpeg" id="candidate-display"><img src="static/candidate-small.jpeg" id="candidate-image"/></a>
+      <pre class="log hidden" id="candidate-log"></pre>
     </div>
   </div>
+  <script>
+    async function refresh()
+    {
+      const output = document.getElementById("candidate-log");
+      output.textContent = "";
+      output.classList.remove("hidden");
+
+      const display = document.getElementById("candidate-display");
+      display.classList.add("hidden");
+
+      const response = await fetch("/candidate/refresh");
+
+      const decoder = new TextDecoder();
+
+      for await (const chunk of response.body) {
+        output.textContent += decoder.decode(chunk);
+      }
+
+      const image = document.getElementById("candidate-image");
+
+      const newImage = new Image();
+      newImage.id = "candidate-image";
+      newImage.src = "static/candidate-small.jpeg?t=" + new Date().getTime();
+
+      await newImage.decode();
+
+      display.insertBefore(newImage, image);
+      display.removeChild(image);
+
+      display.classList.remove("hidden");
+      output.classList.add("hidden");
+    }
+
+    document.getElementById("candidate-refresh").addEventListener("click", refresh);
+  </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, make_response, render_template
 import os
+import subprocess
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -18,6 +19,33 @@ def create_app(test_config=None):
 
 app = create_app()
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.get("/candidate/refresh")
+def refreshCandidate():
+    process = subprocess.Popen(["venv/bin/python", "board-bot.py", "--capture-candidate"], stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT, text=True)
+
+    response = make_response(process.stdout)
+    response.mimetype = "text/plain"
+
+    return response
+
+
+@app.post("/refresh")
+def refresh():
+    return render_template("refresh.html")
+
+
+@app.get("/refresh/execute")
+def refreshCommand():
+    process = subprocess.Popen(["venv/bin/python", "board-bot.py"], stdout=subprocess.PIPE, text=True)
+
+    response = make_response(process.stdout)
+    response.mimetype = "text/plain"
+
+    return response
